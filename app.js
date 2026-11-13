@@ -309,6 +309,8 @@ document.addEventListener("DOMContentLoaded", function () {
     colocarFechaActual();
     aplicarVisibilidadLeyenda();
     crearBotonNuevoDia();
+    crearBotonHistorial();
+    crearBotonGuardarFinal();
     cargarCuarteles();
     inicializarMapa();
 });
@@ -1870,6 +1872,161 @@ function crearBotonNuevoDia() {
     };
 }
 
+function crearBotonHistorial() {
+
+    const descargar = document.getElementById("btnDescargarMapa");
+
+    if (!descargar || document.getElementById("btnHistorialMapa")) {
+        return;
+    }
+
+    const boton = document.createElement("button");
+
+    boton.id = "btnHistorialMapa";
+    boton.type = "button";
+    boton.className = "btn-descargar";
+    boton.textContent = "📅 Historial de mapas";
+    boton.style.background = "#315c9e";
+
+    boton.addEventListener("click", function() {
+        const panel = document.getElementById("panelHistorialMapa");
+
+        if (panel) {
+            panel.hidden = !panel.hidden;
+        }
+    });
+
+    const panel = document.createElement("div");
+    panel.id = "panelHistorialMapa";
+    panel.hidden = true;
+    panel.style.padding = "15px";
+    panel.style.background = "#ffffff";
+    panel.style.border = "1px solid #cccccc";
+    panel.style.borderRadius = "8px";
+    panel.style.marginTop = "10px";
+
+    panel.innerHTML = `
+        <h3>📅 Historial de mapas</h3>
+        <label for="fechaHistorialMapa">Seleccionar fecha:</label>
+        <input type="date" id="fechaHistorialMapa">
+        <button type="button" id="btnConsultarHistorial">
+            🔍 Consultar
+        </button>
+        <button type="button" id="btnDescargarHistorial">
+            ⬇️ Descargar mapa
+        </button>
+        <p id="mensajeHistorialMapa">
+            Selecciona una fecha para consultar su programación.
+        </p>
+    `;
+
+    const contenedor = descargar.parentElement;
+    contenedor.appendChild(boton);
+    contenedor.insertAdjacentElement("afterend", panel);
+
+    const selector = document.createElement("select");
+    selector.id = "versionHistorialMapa";
+    selector.style.margin = "8px";
+    selector.innerHTML = '<option value="">Primero consulta una fecha</option>';
+    document.getElementById("btnConsultarHistorial").insertAdjacentElement("afterend", selector);
+
+    const volver = document.createElement("button");
+    volver.type = "button";
+    volver.textContent = "↩ Volver al mapa actual";
+    volver.addEventListener("click", volverMapaActual);
+    document.getElementById("btnDescargarHistorial").insertAdjacentElement("afterend", volver);
+
+    document.getElementById("btnConsultarHistorial").addEventListener("click", consultarHistorialMapa);
+    document.getElementById("btnDescargarHistorial").addEventListener("click", descargarHistorialMapa);
+    selector.addEventListener("change", mostrarVersionHistorial);
+
+}
+
+
+/* Guardado final y consulta de versiones históricas (sin tocar registros_cuartel). */
+let fechaVistaHistorica = null;
+let versionesHistorial = [];
+let datosVigentes = { aplicaciones: {}, riegos: {}, labores: {} };
+const copiarDatosMapa = () => JSON.parse(JSON.stringify({ aplicaciones, riegos, labores }));
+const fechaLocalMapa = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+};
+function pintarDatosMapa(datos) {
+    aplicaciones = JSON.parse(JSON.stringify(datos.aplicaciones || {}));
+    riegos = JSON.parse(JSON.stringify(datos.riegos || {}));
+    labores = JSON.parse(JSON.stringify(datos.labores || {}));
+    refrescarTodo();
+}
+function crearBotonGuardarFinal() {
+    const descargar = document.getElementById("btnDescargarMapa");
+    if (!descargar || document.getElementById("btnGuardarMapaFinal")) return;
+    const boton = document.createElement("button");
+    boton.type = "button";
+    boton.id = "btnGuardarMapaFinal";
+    boton.className = "btn-descargar";
+    boton.style.background = "#7253b8";
+    boton.textContent = "💾 Guardar mapa final";
+    descargar.insertAdjacentElement("afterend", boton);
+    boton.addEventListener("click", async () => {
+        if (!window.santaDB?.listo) return alert("Inicia sesión en Supabase primero.");
+        if (fechaVistaHistorica) return alert("Primero vuelve al mapa actual.");
+        const fecha = prompt("Fecha del mapa final (AAAA-MM-DD):", fechaLocalMapa());
+        if (fecha === null) return;
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha) || Number.isNaN(new Date(fecha+"T12:00:00").getTime())) {
+            return alert("Fecha no válida. Usa AAAA-MM-DD.");
+        }
+        if (!confirm(`¿Guardar una copia FINAL del mapa del ${fecha}? No se cambiarán los registros actuales.`)) return;
+        boton.disabled = true;
+        try {
+            await window.santaDB.guardarMapaFinal(fecha, copiarDatosMapa());
+            alert("✅ Mapa final guardado en Supabase. Puedes consultarlo en Historial.");
+        } catch (error) {
+            console.error(error);
+            alert("No se pudo guardar el mapa: " + error.message);
+        } finally { boton.disabled = false; }
+    });
+}
+async function consultarHistorialMapa() {
+    const fecha = document.getElementById("fechaHistorialMapa").value;
+    const mensaje = document.getElementById("mensajeHistorialMapa");
+    const selector = document.getElementById("versionHistorialMapa");
+    if (!fecha) return alert("Selecciona una fecha.");
+    if (!window.santaDB?.listo) return alert("Inicia sesión primero.");
+    try {
+        versionesHistorial = await window.santaDB.consultarMapas(fecha);
+        selector.replaceChildren();
+        if (!versionesHistorial.length) {
+            selector.add(new Option("No hay mapas guardados", ""));
+            mensaje.textContent = "No hay mapas finales guardados para esta fecha.";
+            return;
+        }
+        versionesHistorial.forEach((v, i) => selector.add(new Option(`Versión ${versionesHistorial.length-i} — ${new Date(v.guardado_en).toLocaleString("es-PE")}`, String(i))));
+        selector.value = "0";
+        mostrarVersionHistorial();
+        mensaje.textContent = `Se encontraron ${versionesHistorial.length} versiones. Estás viendo una copia histórica (solo lectura).`;
+    } catch (error) { console.error(error); mensaje.textContent = "Error: " + error.message; }
+}
+function mostrarVersionHistorial() {
+    const indice = document.getElementById("versionHistorialMapa").value;
+    if (indice === "" || !versionesHistorial[Number(indice)]) return;
+    const version = versionesHistorial[Number(indice)];
+    fechaVistaHistorica = version.fecha;
+    pintarDatosMapa(version);
+    const partes = version.fecha.split("-");
+    document.getElementById("fechaActual").textContent = `${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+function volverMapaActual() {
+    fechaVistaHistorica = null;
+    pintarDatosMapa(datosVigentes);
+    colocarFechaActual();
+    const mensaje = document.getElementById("mensajeHistorialMapa");
+    if (mensaje) mensaje.textContent = "Regresaste al mapa actual compartido.";
+}
+function descargarHistorialMapa() {
+    if (!fechaVistaHistorica) return alert("Primero consulta y selecciona un mapa histórico.");
+    descargarMapaComoImagen();
+}
 
 // AGREGADO PARA ACTULIZAR MAPA
 function limpiarProgramacionActual() {
@@ -2284,7 +2441,7 @@ function descargarMapaComoImagen() {
             contexto.drawImage(imagen, 0, 0, canvas.width, canvas.height);
 
             const enlace = document.createElement("a");
-            const fechaArchivo = new Date().toISOString().slice(0, 10);
+            const fechaArchivo = fechaVistaHistorica || fechaLocalMapa();
 
             enlace.download = `mapa_fundo_santa_rosa_${fechaArchivo}.png`;
             enlace.href = canvas.toDataURL("image/png");
@@ -2426,7 +2583,7 @@ function dibujarSwatchLeyenda(svgFinal, item, x, y, escala) {
 }
 /* Adaptador de persistencia: los controles originales conservan su diseño. */
 (function () {
-  const nombres = ["registrarAplicacion", "eliminarAplicacion", "registrarRiego", "eliminarRiego", "registrarLabor", "modificarLabor", "eliminarLabor", "reiniciarMapa"];
+  const nombres = ["registrarAplicacion", "eliminarAplicacion", "registrarRiego", "eliminarRiego", "registrarLabor", "modificarLabor", "eliminarLabor"];
   const originales = Object.fromEntries(nombres.map(n => [n, eval(n)]));
   let ocupado = false;
   const copia = obj => JSON.parse(JSON.stringify(obj));
@@ -2434,6 +2591,7 @@ function dibujarSwatchLeyenda(svgFinal, item, x, y, escala) {
   const restaurar = anterior => { aplicaciones = anterior.aplicaciones; riegos = anterior.riegos; labores = anterior.labores; refrescarTodo(); };
   async function ejecutar(nombre) {
     if (ocupado) return;
+    if (fechaVistaHistorica) { alert("Estás viendo un mapa histórico. Vuelve al mapa actual para registrar cambios."); return; }
     if (!window.santaDB?.listo) { alert("Inicie sesión y espere a que se carguen los datos de Supabase."); return; }
     ocupado = true;
     const anterior = snapshot();
@@ -2454,8 +2612,8 @@ function dibujarSwatchLeyenda(svgFinal, item, x, y, escala) {
   registrarLabor = () => ejecutar("registrarLabor");
   modificarLabor = () => ejecutar("modificarLabor");
   eliminarLabor = () => ejecutar("eliminarLabor");
-  reiniciarMapa = () => ejecutar("reiniciarMapa");
   window.santaAplicarDatos = function (datos) {
-    aplicaciones = datos.aplicaciones; riegos = datos.riegos; labores = datos.labores; refrescarTodo();
+    datosVigentes = JSON.parse(JSON.stringify(datos));
+    if (!fechaVistaHistorica) pintarDatosMapa(datosVigentes);
   };
 })();

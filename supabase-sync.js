@@ -39,6 +39,27 @@
   const db = window.santaDB = {
     listo: false,
 
+    guardarMapaFinal: async (fecha, datos) => {
+      if (!db.listo) throw new Error("Inicia sesión primero.");
+      const { data: sesion, error: errorSesion } = await cliente.auth.getUser();
+      if (errorSesion || !sesion.user) throw new Error("Sesión no válida.");
+      const { error } = await cliente.from("historial_mapas").insert({
+        fecha, nombre: "Mapa final",
+        aplicaciones: datos.aplicaciones || {},
+        riegos: datos.riegos || {},
+        labores: datos.labores || {},
+        guardado_por: sesion.user.id
+      });
+      if (error) throw error;
+    },
+    consultarMapas: async fecha => {
+      if (!db.listo) throw new Error("Inicia sesión primero.");
+      const { data, error } = await cliente.from("historial_mapas")
+        .select("id,fecha,nombre,aplicaciones,riegos,labores,guardado_en")
+        .eq("fecha", fecha).order("guardado_en", { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
     sincronizar: async (antes, despues) => {
       if (!db.listo) {
         throw new Error("La base de datos aún no está lista");
