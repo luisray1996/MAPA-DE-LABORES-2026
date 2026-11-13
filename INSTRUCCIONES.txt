@@ -1,0 +1,22 @@
+FUNDO SANTA ROSA - CÓDIGO FUENTE COMPLETO
+
+ARCHIVOS:
+index.html - interfaz y mapa SVG
+styles.css - diseño original
+app.js - aplicaciones, riegos, labores, edición y mapa
+supabase-config.js - URL y clave publicable de Supabase
+supabase-sync.js - login, sincronización y tiempo real
+supabase.sql - estructura de base de datos y políticas RLS
+
+PASOS:
+1. Ejecuta supabase.sql en SQL Editor de tu proyecto Supabase (si aún no lo hiciste).
+2. Crea un usuario en Authentication > Users (ya realizado si aparece en la lista).
+3. Abre esta carpeta con VS Code y usa Live Server, o desde una terminal dentro de la carpeta ejecuta: py -m http.server 5500
+4. Abre http://localhost:5500/ y accede con tu usuario de Supabase.
+5. Prueba registrar un riego, una aplicación y una labor, y recarga la página.
+6. Para publicar, reemplaza los archivos de tu proyecto web y realiza el despliegue en Vercel.
+
+IMPORTANTE:
+- No coloques secret key ni service_role en archivos públicos.
+- Si no funciona, abre F12 > Console y comparte el texto del error (sin contraseñas).
+- Este paquete procede de los archivos compartidos en la conversación; no es una copia descargada del código privado del despliegue de Vercel.

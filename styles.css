@@ -1,0 +1,260 @@
+/* =====================================================
+   CONFIGURACIÓN GENERAL
+===================================================== */
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f8;
+    color: #222;
+}
+
+/* ENCABEZADO */
+.encabezado {
+    background: #070978;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #ffffff;
+}
+.titulo-principal h1 { margin: 0; font-size: 25px; color: #ffffff; }
+.titulo-principal p { margin: 4px 0 0; color: #ffffff; }
+.fecha-header { font-weight: bold; color: #ffffff; }
+
+/* MENÚ */
+.menu {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    background: white;
+    border-bottom: 1px solid #ddd;
+}
+.menu-btn {
+    border: none;
+    background: #f1f1f1;
+    padding: 10px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+.menu-btn:hover { background: #e5e5e5; }
+.menu-btn.activo { background: #ffe066; color: #5c4200; font-weight: bold; }
+
+/* FORMULARIO */
+.formulario-horizontal {
+    background: white;
+    margin: 10px 15px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.seccion { display: none; }
+.seccion.activa { display: block; }
+.formulario-titulo { font-size: 17px; font-weight: bold; margin-bottom: 10px; color: #765000; }
+.formulario-grid { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.campo-form { display: flex; flex-direction: column; gap: 5px; min-width: 145px; }
+.campo-form label { font-size: 12px; font-weight: bold; color: #555; }
+.campo-form select, .campo-form input {
+    height: 37px;
+    padding: 6px 9px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: white;
+    font-size: 14px;
+}
+.campo-form select:focus, .campo-form input:focus { outline: none; border-color: #d39a00; }
+
+/* BOTONES */
+.boton-form { min-width: 170px; }
+.btn-registrar, .btn-eliminar {
+    height: 37px;
+    border: none;
+    border-radius: 6px;
+    padding: 0 17px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+.btn-registrar { background: #002cc9; }
+.btn-eliminar { background: #b91c1c; }
+.btn-eliminar:hover { background: #991b1b; }
+
+/* RADIO */
+.radio-grupo { display: flex; align-items: center; gap: 10px; height: 37px; white-space: nowrap; }
+.radio-grupo label { font-weight: normal; font-size: 13px; color: #333; }
+
+/* CUARTELES DEL TURNO */
+.lista-cuarteles {
+    min-height: 37px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: 12px;
+    color: #777;
+    max-width: 420px;
+}
+.cuartel-chip {
+    background: #fff3cd;
+    border: 1px solid #e6c76a;
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+    color: #765000;
+}
+
+/* MENSAJES */
+.mensaje { margin-top: 8px; padding: 7px 10px; border-radius: 6px; font-size: 13px; }
+.mensaje:empty { display: none; }
+
+/* MAPA */
+.contenedor-mapa {
+    margin: 10px 15px 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+.cabecera-mapa {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 16px;
+    border-bottom: 1px solid #ddd;
+}
+.cabecera-mapa h2 { margin: 0; font-size: 18px; color: #555; }
+.btn-descargar {
+    height: 36px;
+    border: none;
+    border-radius: 6px;
+    padding: 0 16px;
+    background: #15803d;
+    color: white;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.btn-descargar:hover { background: #166534; }
+.btn-descargar:disabled { background: #9ca3af; cursor: wait; }
+#estadoSeleccionado { display: block; margin-top: 3px; font-size: 13px; color: #777; }
+
+/* LEYENDA */
+.leyenda {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 14px;
+    padding: 9px 16px;
+}
+.leyenda span { display: flex; align-items: center; gap: 4px; }
+.color {
+    width: 15px; height: 15px;
+    border: 1px solid #999;
+    border-radius: 3px;
+    display: inline-block;
+}
+.rojo { background: #f50808; }
+.rojo-suave { background: #f87171; }
+.verde-claro { background: #a7f3a0; }
+.azul { background: #81d4fa; }
+.comedor { background: #c100c1; border-color: #7a007a; }
+.flecha { font-weight: bold; font-size: 18px; line-height: 1; }
+.flecha-verde { color: #16a34a; }
+.flecha-roja { color: #dc2626; }
+.ovalo-paradero {
+    width: 18px; height: 10px;
+    background: #5559ff;
+    border: 1px solid #1e3a8a;
+    border-radius: 50%;
+    display: inline-block;
+}
+.franja-leyenda {
+    width: 15px; height: 15px;
+    background: #ffffff;
+    border: 3px solid #f50808;
+    border-radius: 2px;
+    display: inline-block;
+}
+
+/* MAPA + CUADRO DETALLES AL COSTADO */
+.mapa-con-panel {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 8px 14px 14px;
+}
+
+#mapaContainer {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: auto;
+    background: #fafafa;
+    border-radius: 8px;
+}
+#mapaContainer svg {
+    width: 100%;
+    max-width: 640px;
+    height: auto;
+    display: block;
+}
+.panel-detalles {
+    flex: 0 0 330px;
+    width: 330px;
+    position: sticky;
+    top: 10px;
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1.5px solid #374151;
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+.panel-detalles h3 { margin: 0 0 4px; font-size: 18px; color: #374151; }
+.panel-nota { margin: 0 0 10px; font-size: 12px; color: #6b7280; }
+.panel-vacio { font-size: 13px; color: #6b7280; margin: 0; }
+.detalle-item {
+    border-left: 6px solid #9ca3af;
+    background: #f9fafb;
+    border-radius: 4px;
+    padding: 6px 9px;
+    margin-bottom: 8px;
+}
+.detalle-titulo { font-weight: bold; font-size: 13px; color: #111827; margin-bottom: 2px; }
+.detalle-linea { font-size: 12.5px; color: #374151; line-height: 1.35; }
+
+/* CUARTELES */
+.cuartel-svg { cursor: pointer; transition: filter 0.15s; }
+.cuartel-svg:hover { filter: brightness(0.94); }
+
+/* INFORMACIÓN DEL CUARTEL */
+.informacion-cuartel { pointer-events: none; user-select: none; }
+.franja-orillado { pointer-events: none; user-select: none; }
+.icono-trabajadores { pointer-events: none; }
+
+/* ESTADO CAMPO */
+.estado-campo { min-width: 220px; padding: 8px 10px; border-radius: 6px; background: #f7f7f7; font-size: 13px; }
+.campo-no-disponible { color: #b91c1c; font-weight: bold; }
+.campo-disponible { color: #15803d; font-weight: bold; }
+
+/* RESPONSIVE */
+@media (max-width: 1000px) {
+    .encabezado { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .cabecera-mapa { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .formulario-grid { align-items: stretch; }
+    .campo-form { flex: 1 1 180px; }
+    .mapa-con-panel { flex-direction: column; }
+    .panel-detalles { width: 100%; flex: none; position: static; max-height: none; }
+}
+@media (max-width: 600px) {
+    .menu { overflow-x: auto; justify-content: flex-start; }
+    .menu-btn { white-space: nowrap; }
+}

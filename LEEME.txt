@@ -1,0 +1,12 @@
+FUNDO SANTA ROSA — VERSIÓN SUPABASE
+
+1. En Supabase abra SQL Editor, copie todo supabase.sql y pulse Run.
+2. En Authentication > Providers > Email, desactive Allow new users to sign up (recomendado).
+3. En Authentication > Users > Add user cree cada cuenta autorizada (correo y contraseña).
+4. Suba index.html, app.js, styles.css, supabase-config.js y supabase-sync.js a su proyecto de Vercel (misma carpeta).
+5. Abra la web, inicie sesión y pruebe registrar/modificar/eliminar un cuartel.
+6. Abra la web en otro navegador con otra cuenta y compruebe que aparecen los cambios.
+
+SEGURIDAD: Nunca publique service_role ni secret keys. La clave sb_publishable es pública; el acceso se controla mediante Auth + RLS. Cualquier usuario autenticado del proyecto tiene acceso a todos los registros: cree solo cuentas autorizadas.
+
+AVISO: No se ha ejecutado SQL en su proyecto remoto; debe hacerlo desde su cuenta. Los registros guardados solo en localStorage no se migran automáticamente.
